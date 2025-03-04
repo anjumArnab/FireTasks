@@ -29,7 +29,7 @@ void _navigateToLogInCreateAccountScreen(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CreateTaskPage(),
+        builder: (context) => const CreateTaskPage(),
       ),
     );
   }
@@ -54,11 +54,7 @@ void _navigateToLogInCreateAccountScreen(BuildContext context) {
         username: 'Sakib Anjum Arnab',
         email: 'arnab@example.com',
         profilePictureUrl: 'https://www.example.com/profile-picture.jpg',
-        isBackupEnabled: false,
-        onBackupToggle: (bool value) {
-          // Handle backup toggle functionality here
-        },
-        onLogout: () {}, // Logout functionality here
+        onLogout: () {},
         onExit: () => Navigator.pop(context)
       ),
       body:Padding(
