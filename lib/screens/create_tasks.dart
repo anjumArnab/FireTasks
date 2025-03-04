@@ -11,6 +11,7 @@ class CreateTaskPage extends StatefulWidget {
   const CreateTaskPage({super.key, this.task, this.taskIndex});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CreateTaskPageState createState() => _CreateTaskPageState();
 }
 
@@ -87,8 +88,6 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
     );
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,7 +111,7 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
               const SizedBox(height: 10),
               TextFormField(
                 controller: descriptionController,
-                maxLines: 3, // Allow the description field to have 5 lines
+                maxLines: 3,
                 decoration: const InputDecoration(
                   labelText: 'Description',
                   border: OutlineInputBorder(
