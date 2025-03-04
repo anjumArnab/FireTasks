@@ -32,7 +32,6 @@ class CustomDrawer extends StatelessWidget {
               color: Colors.black26
             ),
           ),
-          const Divider(),
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.black),
             title: const Text('Logout'),
