@@ -8,9 +8,8 @@ class FirebaseAuthMethods{
   // EMAIL Sign UP
   Future<void> singUpWithEmail({required String email, required String password, required BuildContext context}) async {
     try{
-     final credential= await _auth.createUserWithEmailAndPassword(email: email, password: password);
-     print(credential.user!.uid);
-      //await sendEmailVerification(context);
+     await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      await sendEmailVerification(context);
     } on FirebaseAuthException catch(e){
       showSnackBar(context, e.message!);
     }
