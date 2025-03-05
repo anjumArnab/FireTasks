@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firetasks/models/task_model.dart';
 import 'package:firetasks/screens/create_tasks.dart';
 import 'package:firetasks/screens/login_page.dart';
+import 'package:firetasks/services/authentication.dart';
 import 'package:firetasks/widgets/custom_button.dart';
 import 'package:firetasks/widgets/drawer.dart';
 import 'package:firetasks/widgets/task_card.dart';
@@ -34,6 +36,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void _signOutUser() async {
+    FirebaseAuthMethods(FirebaseAuth.instance).signOut(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,9 +48,19 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(icon: const Icon(Icons.add), onPressed: () => _navigateToCreateTaskPage(context)),
           const SizedBox(width: 30),
-          CustomButton(
-            text: "Log In",
-            onPressed: () => _navigateToLogInCreateAccountScreen(context),
+          StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+             builder: (context, snapshot) {
+              if (snapshot.hasData && snapshot.data != null) {
+                return const SizedBox(
+                    width: 15); // Empty space instead of button
+              } else {
+                return CustomButton(
+                  onPressed: () => _navigateToLogInCreateAccountScreen(context),
+                  text: 'Login',
+                );
+              }
+            },
           ),
           const SizedBox(width: 30),
         ],
@@ -53,7 +69,7 @@ class _HomePageState extends State<HomePage> {
         username: 'Sakib Anjum Arnab',
         email: 'arnab@example.com',
         profilePictureUrl: 'https://www.example.com/profile-picture.jpg',
-        onLogout: () {},
+        onLogout: _signOutUser,
         onExit: () => Navigator.pop(context),
       ),
       body: Padding(

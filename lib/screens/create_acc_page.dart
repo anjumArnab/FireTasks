@@ -1,3 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firetasks/screens/homepage.dart';
+import 'package:firetasks/services/authentication.dart';
 import 'package:firetasks/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 
@@ -17,6 +20,19 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  void _signUpUser() async {
+    FirebaseAuthMethods(FirebaseAuth.instance).singUpWithEmail(
+      email: _emailController.text, 
+      password: _passwordController.text, 
+      context: context);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HomePage(),
+      ),
+    );
+  }
 
 
   @override
@@ -102,7 +118,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                 ),
                 const SizedBox(height: 16),
                 CustomButton(
-                    onPressed: (){}, text: "Create Account"),
+                    onPressed: _signUpUser, text: "Create Account"),
               ],
             ),
           ),

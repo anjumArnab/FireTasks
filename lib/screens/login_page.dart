@@ -1,4 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firetasks/screens/create_acc_page.dart';
+import 'package:firetasks/screens/homepage.dart';
+import 'package:firetasks/services/authentication.dart';
 import 'package:firetasks/widgets/custom_button.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +26,20 @@ class _LoginCreateAccountScreenState extends State<LoginCreateAccountScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => const CreateAccountScreen(),
+      ),
+    );
+  }
+
+  void _signInUser() async {
+    FirebaseAuthMethods(FirebaseAuth.instance).signInWithEmail(
+    email: _emailController.text,
+    password: _passwordController.text,
+    context: context
+    );
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HomePage(),
       ),
     );
   }
@@ -88,7 +105,7 @@ class _LoginCreateAccountScreenState extends State<LoginCreateAccountScreen> {
                 ),
                 const SizedBox(height: 16),
                 CustomButton(
-                  onPressed: (){},
+                  onPressed: _signInUser,
                   text: 'Login',
                 ),
                 const SizedBox(height: 15),
