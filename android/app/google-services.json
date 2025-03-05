@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "119190373496",
+    "project_id": "firetasks-ff04c",
+    "storage_bucket": "firetasks-ff04c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:119190373496:android:bd274c8524bd273c06598d",
+        "android_client_info": {
+          "package_name": "com.example.firetasks"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1OSnEH1u-nndR6eQ38FfXapPvVI-oWvw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
