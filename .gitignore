@@ -45,3 +45,5 @@ app.*.map.json
 /macos
 /web
 /windows
+/firebase_options.dart
+/android/app/src/google-services.json
