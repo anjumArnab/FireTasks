@@ -16,7 +16,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Task> filteredTasks = [];
 
-void _navigateToLogInCreateAccountScreen(BuildContext context) {
+  void _navigateToLogInCreateAccountScreen(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -24,8 +24,8 @@ void _navigateToLogInCreateAccountScreen(BuildContext context) {
       ),
     );
   }
- 
- void _navigateToCreateTaskPage(BuildContext context) {
+
+  void _navigateToCreateTaskPage(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -34,7 +34,6 @@ void _navigateToLogInCreateAccountScreen(BuildContext context) {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,7 +41,7 @@ void _navigateToLogInCreateAccountScreen(BuildContext context) {
         title: const Text("FireTasks"),
         actions: [
           IconButton(icon: const Icon(Icons.add), onPressed: () => _navigateToCreateTaskPage(context)),
-          const SizedBox(width: 30), 
+          const SizedBox(width: 30),
           CustomButton(
             text: "Log In",
             onPressed: () => _navigateToLogInCreateAccountScreen(context),
@@ -55,9 +54,9 @@ void _navigateToLogInCreateAccountScreen(BuildContext context) {
         email: 'arnab@example.com',
         profilePictureUrl: 'https://www.example.com/profile-picture.jpg',
         onLogout: () {},
-        onExit: () => Navigator.pop(context)
+        onExit: () => Navigator.pop(context),
       ),
-      body:Padding(
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: GridView.builder(
           itemCount: filteredTasks.isEmpty ? 1 : filteredTasks.length,
@@ -86,20 +85,42 @@ void _navigateToLogInCreateAccountScreen(BuildContext context) {
               );
             }
             final task = filteredTasks[index];
-            return Opacity(
-              opacity: task.isChecked ? 0.5 : 1.0,
-              child: GestureDetector(
-                onTap: () {},
-                child: TaskCard(
-                  task: task,
-                  onCheckboxChanged: (value) {
-                    setState(() {
-                      task.isChecked = value ?? false;
-                    });
-                  },
-                  onDelete: () {},
-                ),
-              ),
+            return DragTarget<Task>(
+              onAcceptWithDetails: (draggedTask) {
+                setState(() {
+                  int oldIndex = filteredTasks.indexOf(draggedTask as Task);
+                  filteredTasks.removeAt(oldIndex);
+                  filteredTasks.insert(index, draggedTask as Task);
+                });
+              },
+              builder: (context, candidateData, rejectedData) {
+                return Opacity(
+                  opacity: task.isChecked ? 0.5 : 1.0,
+                  child: Draggable<Task>(
+                    data: task,
+                    feedback: Material(
+                      child: TaskCard(
+                        task: task,
+                        onCheckboxChanged: null,
+                        onDelete: null,
+                      ),
+                    ),
+                    childWhenDragging: const SizedBox.shrink(),
+                    child: GestureDetector(
+                      onTap: () {},
+                      child: TaskCard(
+                        task: task,
+                        onCheckboxChanged: (value) {
+                          setState(() {
+                            task.isChecked = value ?? false;
+                          });
+                        },
+                        onDelete: () {},
+                      ),
+                    ),
+                  ),
+                );
+              },
             );
           },
         ),
