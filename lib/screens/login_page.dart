@@ -18,7 +18,7 @@ class _LoginCreateAccountScreenState extends State<LoginCreateAccountScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-void _navigateToCreateAccountScreen(BuildContext context) {
+  void _navigateToCreateAccountScreen(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -26,8 +26,6 @@ void _navigateToCreateAccountScreen(BuildContext context) {
       ),
     );
   }
-
-  
 
   @override
   Widget build(BuildContext context) {
