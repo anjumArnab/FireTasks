@@ -57,6 +57,28 @@ class _LoginCreateAccountScreenState extends State<LoginCreateAccountScreen> {
     }
   }
 
+  void _signInWithGoogle(BuildContext context) async {
+    await FirebaseAuthMethods(FirebaseAuth.instance).signInWithGoogle(context);
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null && user.emailVerified) {
+      // If the user is verified, navigate to the HomePage
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomePage(),
+        ),
+      );
+    } else {
+      // If the user is not verified, navigate to the LoginCreateAccountScreen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginCreateAccountScreen(),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -145,7 +167,7 @@ class _LoginCreateAccountScreenState extends State<LoginCreateAccountScreen> {
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0),
                   child: CustomButton(
-                    onPressed: () => _navigateToCreateAccountScreen(context),
+                    onPressed: () => _signInWithGoogle(context),
                     text: 'Sign in with Google',
                   ),
                 ),
