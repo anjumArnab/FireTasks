@@ -12,7 +12,20 @@
           "package_name": "com.example.firetasks"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "119190373496-a766crsdujr3ab5h7bl631ugiocogemb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.firetasks",
+            "certificate_hash": "417b902cedcca4fc49c3c3c4e47922a8796b12b9"
+          }
+        },
+        {
+          "client_id": "119190373496-dtn5dc6i5sqod0pvu1v47m7uk98it700.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB1OSnEH1u-nndR6eQ38FfXapPvVI-oWvw"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "119190373496-dtn5dc6i5sqod0pvu1v47m7uk98it700.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "119190373496-ohi5jgn2t8t7m1blol0oiqgpffcffi5a.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.firetasks"
+              }
+            }
+          ]
         }
       }
     }
