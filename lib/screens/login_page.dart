@@ -11,8 +11,8 @@ class LoginCreateAccountScreen extends StatefulWidget {
 
   @override
   // ignore: library_private_types_in_public_api
-  _LoginCreateAccountScreenState createState() => _LoginCreateAccountScreenState();
-      
+  _LoginCreateAccountScreenState createState() =>
+      _LoginCreateAccountScreenState();
 }
 
 class _LoginCreateAccountScreenState extends State<LoginCreateAccountScreen> {
@@ -31,17 +31,30 @@ class _LoginCreateAccountScreenState extends State<LoginCreateAccountScreen> {
   }
 
   void _signInUser() async {
-    FirebaseAuthMethods(FirebaseAuth.instance).signInWithEmail(
-    email: _emailController.text,
-    password: _passwordController.text,
-    context: context
+    await FirebaseAuthMethods(FirebaseAuth.instance).signInWithEmail(
+      email: _emailController.text,
+      password: _passwordController.text,
+      context: context,
     );
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const HomePage(),
-      ),
-    );
+
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null && user.emailVerified) {
+      // If the user is verified, navigate to the HomePage
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomePage(),
+        ),
+      );
+    } else {
+      // If the user is not verified, navigate to the LoginCreateAccountScreen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginCreateAccountScreen(),
+        ),
+      );
+    }
   }
 
   @override
@@ -118,14 +131,14 @@ class _LoginCreateAccountScreenState extends State<LoginCreateAccountScreen> {
                         style: TextStyle(color: Colors.black),
                       ),
                       TextSpan(
-                        text: 'Create one',
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: Colors.blueAccent,
-                        ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () => _navigateToCreateAccountScreen(context)
-                      ),
+                          text: 'Create one',
+                          style: const TextStyle(
+                            fontSize: 15,
+                            color: Colors.blueAccent,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap =
+                                () => _navigateToCreateAccountScreen(context)),
                     ],
                   ),
                 ),
