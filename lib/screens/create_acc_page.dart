@@ -1,9 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firetasks/screens/homepage.dart';
+import 'package:firetasks/screens/login_page.dart';
 import 'package:firetasks/services/authentication.dart';
 import 'package:firetasks/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
-
 
 class CreateAccountScreen extends StatefulWidget {
   const CreateAccountScreen({super.key});
@@ -22,18 +21,17 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   void _signUpUser() async {
-    FirebaseAuthMethods(FirebaseAuth.instance).singUpWithEmail(
-      email: _emailController.text, 
-      password: _passwordController.text, 
-      context: context);
+    FirebaseAuthMethods(FirebaseAuth.instance).signUpWithEmail(
+        email: _emailController.text,
+        password: _passwordController.text,
+        context: context);
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const HomePage(),
+        builder: (context) => const LoginCreateAccountScreen(),
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -117,8 +115,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   obscureText: !_isPasswordVisible,
                 ),
                 const SizedBox(height: 16),
-                CustomButton(
-                    onPressed: _signUpUser, text: "Create Account"),
+                CustomButton(onPressed: _signUpUser, text: "Create Account"),
               ],
             ),
           ),
