@@ -31,7 +31,4 @@ class CustomTextField extends StatelessWidget {
       obscureText: obscureText,
     );
   }
-
-
-
 }
