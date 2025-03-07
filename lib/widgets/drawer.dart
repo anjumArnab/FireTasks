@@ -1,3 +1,4 @@
+import 'package:firetasks/screens/user_info.dart';
 import 'package:flutter/material.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -15,7 +16,14 @@ class CustomDrawer extends StatelessWidget {
     required this.onLogout,
     required this.onExit,
   });
-
+void _navToUserInfo(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const UserInfo(),
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -24,9 +32,12 @@ class CustomDrawer extends StatelessWidget {
           UserAccountsDrawerHeader(
             accountName: Text(username),
             accountEmail: Text(email),
-            currentAccountPicture: CircleAvatar(
-              backgroundImage: NetworkImage(
-                  profilePictureUrl),
+            currentAccountPicture: GestureDetector(
+              onTap: () => _navToUserInfo(context),
+              child: CircleAvatar(
+                backgroundImage: NetworkImage(
+                    profilePictureUrl),
+              ),
             ),
             decoration: const BoxDecoration(
               color: Colors.black26
