@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firetasks/screens/login_page.dart';
 import 'package:firetasks/services/authentication.dart';
 import 'package:firetasks/widgets/custom_button.dart';
+import 'package:firetasks/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 
 class CreateAccountScreen extends StatefulWidget {
@@ -16,7 +17,6 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   bool _isPasswordVisible = false; // Track password visibility
 
   final TextEditingController _fullNameController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -47,72 +47,37 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.grey[300],
-                  child: IconButton(
-                    icon: const Icon(Icons.add_a_photo),
-                    onPressed: () {},
+                 const Text(
+                  'Register',
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 1.5,
                   ),
                 ),
                 const SizedBox(height: 16),
-                TextFormField(
-                  controller: _fullNameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Full Name',
-                    hintText: 'Enter your full name',
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                  ),
-                ),
+                CustomTextField(
+                    controller: _fullNameController, labelText: "Full Name"),
                 const SizedBox(height: 16),
-                TextFormField(
-                  controller: _ageController,
-                  decoration: const InputDecoration(
-                    labelText: 'Age',
-                    hintText: 'Enter your age',
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
+                CustomTextField(
+                    controller: _emailController,
+                    labelText: "Email",
+                    keyboardType: TextInputType.emailAddress),
                 const SizedBox(height: 16),
-                TextFormField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    hintText: 'Enter your email',
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
+                CustomTextField(
                   controller: _passwordController,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    hintText: 'Enter your password',
-                    border: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                          _isPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                          color: Colors.black),
-                      onPressed: () {
-                        setState(() {
-                          _isPasswordVisible = !_isPasswordVisible;
-                        });
-                      },
-                    ),
-                  ),
+                  labelText: "Password",
                   obscureText: !_isPasswordVisible,
+                  suffixIcon: IconButton(
+                    icon: Icon(_isPasswordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off),
+                    onPressed: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
+                  ),
                 ),
                 const SizedBox(height: 16),
                 CustomButton(onPressed: _signUpUser, text: "Create Account"),
