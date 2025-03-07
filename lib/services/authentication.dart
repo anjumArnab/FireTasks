@@ -84,7 +84,62 @@ class FirebaseAuthMethods {
     }
   }
 
-  // Sign OUT
+  // Update Email
+  Future<void> updateEmail({required String newEmail, required BuildContext context}) async{
+    try{
+      await _auth.currentUser?.verifyBeforeUpdateEmail(newEmail);
+      showSnackBar(context, "Email updated successfully.");
+    } on FirebaseAuthException catch (e) {
+      showSnackBar(context, e.message!);
+    }
+  }
+
+  // Change Password
+    Future<void> updatePasswordWithReauthentication({
+    required String oldPassword,
+    required String newPassword,
+    required String confirmPassword,
+    required BuildContext context,
+  }) async {
+    try {
+      // Check if new password and confirm password match
+      if (newPassword != confirmPassword) {
+        showSnackBar(context, "New password and confirm password do not match.");
+        return;
+      }
+
+      // Get the current user
+      User? user = _auth.currentUser;
+
+      if (user != null) {
+        // Reauthenticate the user with the old password
+        AuthCredential credential = EmailAuthProvider.credential(
+          email: user.email!,
+          password: oldPassword,
+        );
+
+        // Reauthenticate the user
+        await user.reauthenticateWithCredential(credential);
+
+        // If reauthentication is successful, update the password
+        await user.updatePassword(newPassword);
+
+        // Show success message
+        showSnackBar(context, "Password updated successfully.");
+      } else {
+        showSnackBar(context, "No user is logged in.");
+      }
+    } on FirebaseAuthException catch (e) {
+      // Handle error (e.g., incorrect old password)
+      if (e.code == 'wrong-password') {
+        showSnackBar(context, "Old password is incorrect.");
+      } else {
+        showSnackBar(context, e.message ?? "An error occurred.");
+      }
+    }
+  }
+
+  // Sign Out
   Future<void> signOut(BuildContext context) async {
     try {
       await _auth.signOut();
@@ -93,4 +148,6 @@ class FirebaseAuthMethods {
       showSnackBar(context, e.message!);
     }
   }
+  
+
 }
