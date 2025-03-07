@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firetasks/services/authentication.dart';
 import 'package:firetasks/widgets/custom_button.dart';
 import 'package:firetasks/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,57 @@ class _UserInfoState extends State<UserInfo> {
   final TextEditingController ageController = TextEditingController(text: "26");
   final TextEditingController dobController =
       TextEditingController(text: "21-12-1994");
+
+  void _handleProfileUpdate(){
+    String newName = nameController.text;
+    String newMotto = mottoController.text;
+    String newEmail = emailController.text;
+    String newAge = ageController.text;
+    String newDob = dobController.text;
+
+    bool emailChanged = newEmail != emailController.text;
+    bool nameChanged = newName != nameController.text;
+    bool mottoChanged = newMotto != mottoController.text;
+    bool ageChanged = newAge != ageController.text;
+    bool dobChanged = newDob != dobController.text;
+
+    if(emailChanged || nameChanged || mottoChanged || ageChanged || dobChanged){
+      if(emailChanged){
+        // Update email
+        FirebaseAuthMethods(FirebaseAuth.instance).updateEmail(newEmail: newEmail, context: context);
+      }
+      if(nameChanged){
+        // Update name
+
+      }
+      if(mottoChanged){
+        // Update motto
+
+      }
+      if(ageChanged){
+        // Update age
+
+      }
+      if(dobChanged){
+        // Update dob
+
+      }
+
+      // Show a snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Profile updated successfully'),
+        ),
+      );
+    } else {
+      // Show a snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No changes detected'),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +109,7 @@ class _UserInfoState extends State<UserInfo> {
             Center(
               child: CustomButton(
                 onPressed: () {
+                  _handleProfileUpdate();
                   setState(() {
                     isEditing = !isEditing;
                   });
