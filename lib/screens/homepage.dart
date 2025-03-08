@@ -89,7 +89,9 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(width: 30),
         ],
       ),
-      drawer: CustomDrawer(
+      drawer: userModel == null 
+    ? null  // Prevents opening the drawer when userModel is null
+    : CustomDrawer(
         userModel: userModel!,
         onLogout: _signOutUser,
         onExit: () => Navigator.pop(context),

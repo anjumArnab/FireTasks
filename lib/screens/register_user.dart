@@ -56,7 +56,7 @@ class _RegisterUserState extends State<RegisterUser> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Resgidter User"),
+          title: const Text("Register User"),
         ),
         body: Center(
             child: Padding(

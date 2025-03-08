@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firetasks/models/user_model.dart';
 import 'package:firetasks/screens/create_acc_page.dart';
 import 'package:firetasks/screens/homepage.dart';
 import 'package:firetasks/screens/register_user.dart';
 import 'package:firetasks/services/authentication.dart';
+import 'package:firetasks/services/database.dart';
 import 'package:firetasks/widgets/custom_button.dart';
 import 'package:firetasks/widgets/custom_text_field.dart';
 import 'package:flutter/gestures.dart';
@@ -33,28 +36,39 @@ class _LoginCreateAccountScreenState extends State<LoginCreateAccountScreen> {
   }
 
   void _signInUser() async {
-    await FirebaseAuthMethods(FirebaseAuth.instance).signInWithEmail(
-      email: _emailController.text,
-      password: _passwordController.text,
-      context: context,
-    );
-
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) { // && user.emailVerified
-      // If the user is verified, navigate to the HomePage
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const RegisterUser(),
-        ),
+    try {
+      await FirebaseAuthMethods(FirebaseAuth.instance).signInWithEmail(
+        email: _emailController.text,
+        password: _passwordController.text,
+        context: context,
       );
-    } else {
-      // If the user is not verified, navigate to the LoginCreateAccountScreen
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const LoginCreateAccountScreen(),
-        ),
+
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        FirestoreMethods firestoreMethods =
+            FirestoreMethods(FirebaseFirestore.instance);
+
+        // Check if user exists in Firestore
+        UserModel? userModel = await firestoreMethods.getUserData(user.uid);
+
+        if (userModel != null) {
+          // If user exists, navigate to HomePage
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomePage()),
+          );
+        } else {
+          // If user does not exist, navigate to RegisterUser
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const RegisterUser()),
+          );
+        }
+      }
+    } catch (e) {
+      // Handle errors (e.g., incorrect password, user not found)
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: ${e.toString()}")),
       );
     }
   }
