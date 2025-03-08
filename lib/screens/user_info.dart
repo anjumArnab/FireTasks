@@ -1,11 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firetasks/models/user_model.dart';
 import 'package:firetasks/services/authentication.dart';
 import 'package:firetasks/widgets/custom_button.dart';
 import 'package:firetasks/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 
 class UserInfo extends StatefulWidget {
-  const UserInfo({super.key});
+  final UserModel userModel; // Accept UserModel as a parameter
+
+  const UserInfo({super.key, required this.userModel});
 
   @override
   State<UserInfo> createState() => _UserInfoState();
@@ -14,63 +17,65 @@ class UserInfo extends StatefulWidget {
 class _UserInfoState extends State<UserInfo> {
   bool isEditing = false;
 
-  final TextEditingController nameController =
-      TextEditingController(text: "Sakib Anjum Arnab");
-  final TextEditingController mottoController =
-      TextEditingController(text: "Let's do something good");
-  final TextEditingController emailController =
-      TextEditingController(text: "anjumarnab050@gmail.com");
-  final TextEditingController ageController = TextEditingController(text: "26");
-  final TextEditingController dobController =
-      TextEditingController(text: "21-12-1994");
+  late TextEditingController nameController;
+  late TextEditingController mottoController;
+  late TextEditingController emailController;
+  late TextEditingController ageController;
+  late TextEditingController dobController;
 
-  void _handleProfileUpdate(){
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controllers with user data
+    nameController = TextEditingController(text: widget.userModel.name);
+    mottoController = TextEditingController(text: widget.userModel.motto);
+    emailController = TextEditingController(text: widget.userModel.email);
+    ageController = TextEditingController(text: widget.userModel.age.toString());
+    dobController = TextEditingController(text: widget.userModel.dob);
+  }
+
+  @override
+  void dispose() {
+    // Dispose controllers to free resources
+    nameController.dispose();
+    mottoController.dispose();
+    emailController.dispose();
+    ageController.dispose();
+    dobController.dispose();
+    super.dispose();
+  }
+
+  void _handleProfileUpdate() {
     String newName = nameController.text;
     String newMotto = mottoController.text;
     String newEmail = emailController.text;
     String newAge = ageController.text;
     String newDob = dobController.text;
 
-    bool emailChanged = newEmail != emailController.text;
-    bool nameChanged = newName != nameController.text;
-    bool mottoChanged = newMotto != mottoController.text;
-    bool ageChanged = newAge != ageController.text;
-    bool dobChanged = newDob != dobController.text;
+    bool emailChanged = newEmail != widget.userModel.email;
+    bool nameChanged = newName != widget.userModel.name;
+    bool mottoChanged = newMotto != widget.userModel.motto;
+    bool ageChanged = newAge != widget.userModel.age.toString();
+    bool dobChanged = newDob != widget.userModel.dob;
 
-    if(emailChanged || nameChanged || mottoChanged || ageChanged || dobChanged){
-      if(emailChanged){
+    if (emailChanged || nameChanged || mottoChanged || ageChanged || dobChanged) {
+      if (emailChanged) {
         // Update email
-        FirebaseAuthMethods(FirebaseAuth.instance).updateEmail(newEmail: newEmail, context: context);
+        FirebaseAuthMethods(FirebaseAuth.instance).updateEmail(
+          newEmail: newEmail,
+          context: context,
+        );
       }
-      if(nameChanged){
-        // Update name
+      // Here, you can implement Firestore updates for other fields as needed.
 
-      }
-      if(mottoChanged){
-        // Update motto
-
-      }
-      if(ageChanged){
-        // Update age
-
-      }
-      if(dobChanged){
-        // Update dob
-
-      }
-
-      // Show a snackbar
+      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Profile updated successfully'),
-        ),
+        const SnackBar(content: Text('Profile updated successfully')),
       );
     } else {
-      // Show a snackbar
+      // Show message if no changes were made
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No changes detected'),
-        ),
+        const SnackBar(content: Text('No changes detected')),
       );
     }
   }
@@ -78,9 +83,7 @@ class _UserInfoState extends State<UserInfo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("User Info"),
-      ),
+      appBar: AppBar(title: const Text("User Info")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -88,23 +91,23 @@ class _UserInfoState extends State<UserInfo> {
           children: [
             isEditing
                 ? _buildEditableField("Name:", nameController)
-                : _buildInfoTile("Name:", nameController.text),
+                : _buildInfoTile("Name:", widget.userModel.name),
             _buildSpacingOrDivider(),
             isEditing
                 ? _buildEditableField("Motto:", mottoController)
-                : _buildInfoTile("Motto:", mottoController.text),
+                : _buildInfoTile("Motto:", widget.userModel.motto),
             _buildSpacingOrDivider(),
             isEditing
                 ? _buildEditableField("Email:", emailController)
-                : _buildInfoTile("Email:", emailController.text),
+                : _buildInfoTile("Email:", widget.userModel.email),
             _buildSpacingOrDivider(),
             isEditing
                 ? _buildEditableField("Age:", ageController)
-                : _buildInfoTile("Age:", ageController.text),
+                : _buildInfoTile("Age:", widget.userModel.age.toString()),
             _buildSpacingOrDivider(),
             isEditing
                 ? _buildEditableField("Date of Birth:", dobController)
-                : _buildInfoTile("Date of Birth:", dobController.text),
+                : _buildInfoTile("Date of Birth:", widget.userModel.dob),
             const SizedBox(height: 20),
             Center(
               child: CustomButton(
@@ -127,29 +130,14 @@ class _UserInfoState extends State<UserInfo> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
+        Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
+        Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
       ],
     );
   }
 
   Widget _buildEditableField(String label, TextEditingController controller) {
-    return CustomTextField(
-      controller: controller,
-      labelText: label,
-    );
+    return CustomTextField(controller: controller, labelText: label);
   }
 
   Widget _buildSpacingOrDivider() {
