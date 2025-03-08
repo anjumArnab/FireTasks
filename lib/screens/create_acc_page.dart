@@ -14,14 +14,14 @@ class CreateAccountScreen extends StatefulWidget {
 }
 
 class _CreateAccountScreenState extends State<CreateAccountScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _isPasswordVisible = false; // Track password visibility
 
-  final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void _signUpUser() async {
-    FirebaseAuthMethods(FirebaseAuth.instance).signUpWithEmail(
+  void _registerUser() async {
+    FirebaseAuthMethods(_auth).signUpWithEmail(
         email: _emailController.text,
         password: _passwordController.text,
         context: context);
@@ -47,17 +47,14 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                 const Text(
-                  'Register',
+                const Text(
+                  'Sign Up',
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.w500,
                     letterSpacing: 1.5,
                   ),
                 ),
-                const SizedBox(height: 16),
-                CustomTextField(
-                    controller: _fullNameController, labelText: "Full Name"),
                 const SizedBox(height: 16),
                 CustomTextField(
                     controller: _emailController,
@@ -80,7 +77,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                CustomButton(onPressed: _signUpUser, text: "Create Account"),
+                CustomButton(onPressed: _registerUser, text: "Create Account"),
               ],
             ),
           ),
