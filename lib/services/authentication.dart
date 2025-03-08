@@ -14,17 +14,26 @@ class FirebaseAuthMethods {
     required BuildContext context,
   }) async {
     try {
+      /*
       UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
+      */
+      await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      /*
       User? user = userCredential.user;
       if (user != null && !user.emailVerified) {
         await sendEmailVerification(context);
         await _auth.signOut(); // Force sign-out after registration
       }
+      */
+
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
@@ -41,7 +50,7 @@ class FirebaseAuthMethods {
           email: email, password: password);
 
       User? user = userCredential.user;
-      if (user != null && user.emailVerified) {
+      if (user != null) { // && user.emailVerified
         showSnackBar(context, "Login successful!");
       } else {
         await _auth.signOut();
