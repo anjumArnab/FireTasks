@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firetasks/screens/create_acc_page.dart';
 import 'package:firetasks/screens/homepage.dart';
+import 'package:firetasks/screens/register_user.dart';
 import 'package:firetasks/services/authentication.dart';
 import 'package:firetasks/widgets/custom_button.dart';
 import 'package:firetasks/widgets/custom_text_field.dart';
@@ -39,12 +40,12 @@ class _LoginCreateAccountScreenState extends State<LoginCreateAccountScreen> {
     );
 
     User? user = FirebaseAuth.instance.currentUser;
-    if (user != null && user.emailVerified) {
+    if (user != null) { // && user.emailVerified
       // If the user is verified, navigate to the HomePage
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const HomePage(),
+          builder: (context) => const RegisterUser(),
         ),
       );
     } else {
