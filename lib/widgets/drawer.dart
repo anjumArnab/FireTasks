@@ -1,46 +1,44 @@
+import 'package:firetasks/models/user_model.dart';
 import 'package:firetasks/screens/user_info.dart';
 import 'package:flutter/material.dart';
 
 class CustomDrawer extends StatelessWidget {
-  final String username;
-  final String email;
-  final String profilePictureUrl;
+  final UserModel userModel;
   final VoidCallback onLogout;
   final VoidCallback onExit;
 
   const CustomDrawer({
     super.key,
-    required this.username,
-    required this.email,
-    required this.profilePictureUrl,
+    required this.userModel,
     required this.onLogout,
     required this.onExit,
   });
-void _navToUserInfo(BuildContext context) {
+
+  void _navToUserInfo(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const UserInfo(),
+        builder: (context) => UserInfo(userModel: userModel), // Pass userModel properly
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
       child: Column(
         children: [
           UserAccountsDrawerHeader(
-            accountName: Text(username),
-            accountEmail: Text(email),
+            accountName: Text(userModel.name),
+            accountEmail: Text(userModel.email),
             currentAccountPicture: GestureDetector(
               onTap: () => _navToUserInfo(context),
-              child: CircleAvatar(
-                backgroundImage: NetworkImage(
-                    profilePictureUrl),
+              child: const CircleAvatar(
+                backgroundImage: NetworkImage(""),
               ),
             ),
             decoration: const BoxDecoration(
-              color: Colors.black26
+              color: Colors.black26,
             ),
           ),
           ListTile(
