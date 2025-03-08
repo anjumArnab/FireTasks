@@ -1,10 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firetasks/models/task_model.dart';
+import 'package:firetasks/models/user_model.dart';
 import 'package:firetasks/screens/create_tasks.dart';
 import 'package:firetasks/screens/login_page.dart';
 import 'package:firetasks/services/authentication.dart';
 import 'package:firetasks/widgets/custom_button.dart';
 import 'package:firetasks/widgets/drawer.dart';
+import 'package:firetasks/services/database.dart'; 
 import 'package:firetasks/widgets/task_card.dart';
 import 'package:flutter/material.dart';
 
@@ -17,6 +20,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Task> filteredTasks = [];
+  UserModel? userModel;
+  bool isLoading = true;
+  final FirestoreMethods _firestoreMethods = FirestoreMethods(FirebaseFirestore.instance); 
 
   void _navigateToLogInCreateAccountScreen(BuildContext context) {
     Navigator.push(
@@ -39,7 +45,25 @@ class _HomePageState extends State<HomePage> {
   void _signOutUser() async {
     FirebaseAuthMethods(FirebaseAuth.instance).signOut(context);
   }
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
 
+   Future<void> _fetchUserData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      UserModel? fetchedUser = await _firestoreMethods.getUserData(user.uid);
+      if (fetchedUser != null) {
+        setState(() {
+          userModel = fetchedUser;
+          isLoading = false;
+        });
+      }
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,9 +90,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       drawer: CustomDrawer(
-        username: 'Sakib Anjum Arnab',
-        email: 'arnab@example.com',
-        profilePictureUrl: 'https://www.example.com/profile-picture.jpg',
+        userModel: userModel!,
         onLogout: _signOutUser,
         onExit: () => Navigator.pop(context),
       ),
