@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../models/task_model.dart';
-import 'priority_button.dart';
 
 class TaskCard extends StatelessWidget {
   final Task task;
@@ -48,10 +47,6 @@ class TaskCard extends StatelessWidget {
                   onChanged: onCheckboxChanged,
                 ),
               ),
-            Align(
-              alignment: Alignment.topLeft,
-              child: PriorityButton(priority: task.priority),
-            ),
             Padding(
               padding: const EdgeInsets.all(10),
               child: Column(
