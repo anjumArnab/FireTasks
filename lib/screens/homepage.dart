@@ -45,13 +45,15 @@ class _HomePageState extends State<HomePage> {
   void _signOutUser() async {
     FirebaseAuthMethods(FirebaseAuth.instance).signOut(context);
   }
+  
   @override
   void initState() {
     super.initState();
     _fetchUserData();
+    _fetchTasks();
   }
 
-   Future<void> _fetchUserData() async {
+  Future<void> _fetchUserData() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       UserModel? fetchedUser = await _firestoreMethods.getUserData(user.uid);
@@ -63,6 +65,14 @@ class _HomePageState extends State<HomePage> {
       }
     }
   }
+
+  void _fetchTasks() {
+  FirebaseFirestore.instance.collection('tasks').snapshots().listen((snapshot) {
+    setState(() {
+      filteredTasks = snapshot.docs.map((doc) => Task.fromMapObject(doc.data())).toList();
+    });
+  });
+}
   
   @override
   Widget build(BuildContext context) {
