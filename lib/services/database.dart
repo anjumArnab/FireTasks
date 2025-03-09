@@ -31,31 +31,30 @@ class FirestoreMethods {
     }
     return null;
   }
-/*
-  // Save task data to Firestore
-  Future<void> saveTaskData(Task task, String uid) async {
-    try {
-      await taskCollection.doc(uid).set(task.toMap());
-      print("Task data saved successfully.");
-    } catch (e) {
-      print("Error saving task data: $e");
-    }
-  }
-*/
 
-// Save task data to Firestore
+  // Save task data to Firestore
   Future<void> saveTaskData(Task task, String userUid) async {
-    try {
-      String taskUid = FirebaseFirestore.instance.collection('tasks').doc().id;
-      await FirebaseFirestore.instance
-          .collection('tasks') // Main collection
-          .doc(taskUid) // Document ID for the task
-          .set(task.toMap());
-      print("Task data saved successfully with ID: $taskUid");
-    } catch (e) {
-      print("Error saving task data: $e");
-    }
+  try {
+    String taskUid = FirebaseFirestore.instance
+        .collection('tasks')
+        .doc(userUid)
+        .collection('userTasks')
+        .doc()
+        .id;
+
+    await FirebaseFirestore.instance
+        .collection('tasks')
+        .doc(userUid)
+        .collection('userTasks')
+        .doc(taskUid)
+        .set(task.toMap());
+
+    print("Task data saved successfully with ID: $taskUid");
+  } catch (e) {
+    print("Error saving task data: $e");
   }
+}
+
 
   // Read tasks from Firestore
   Stream<List<Task>> getTasks() {
