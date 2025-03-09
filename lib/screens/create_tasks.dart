@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firetasks/models/task_model.dart';
 import 'package:firetasks/widgets/custom_button.dart';
@@ -86,6 +87,7 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
   }
 
   Future<void> _saveOrUpdateTask() async {
+    User? user = FirebaseAuth.instance.currentUser;
     String title = titleController.text.trim();
     String description = descriptionController.text.trim();
     String timeAndDate = timeController.text.trim();
@@ -107,7 +109,7 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
 
     if (widget.task == null) {
       // Save new task
-      await firestoreMethods.saveTaskData(task, DateTime.now().millisecondsSinceEpoch.toString());
+      await firestoreMethods.saveTaskData(task, user!.uid);
     } else {
       // Update existing task
       task.id = widget.task!.id; // Retain existing ID

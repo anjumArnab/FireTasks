@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firetasks/models/task_model.dart';
 import 'package:firetasks/models/user_model.dart';
 
-class FirestoreMethods{
+class FirestoreMethods {
   final FirebaseFirestore _firestore;
   FirestoreMethods(this._firestore);
   final CollectionReference taskCollection =
@@ -21,7 +21,8 @@ class FirestoreMethods{
   // Fetch user data from Firestore
   Future<UserModel?> getUserData(String uid) async {
     try {
-      DocumentSnapshot doc = await _firestore.collection('users').doc(uid).get();
+      DocumentSnapshot doc =
+          await _firestore.collection('users').doc(uid).get();
       if (doc.exists) {
         return UserModel.fromMap(doc.data() as Map<String, dynamic>);
       }
@@ -30,7 +31,7 @@ class FirestoreMethods{
     }
     return null;
   }
-
+/*
   // Save task data to Firestore
   Future<void> saveTaskData(Task task, String uid) async {
     try {
@@ -40,7 +41,23 @@ class FirestoreMethods{
       print("Error saving task data: $e");
     }
   }
-   // Read tasks from Firestore
+*/
+
+// Save task data to Firestore
+  Future<void> saveTaskData(Task task, String userUid) async {
+    try {
+      String taskUid = FirebaseFirestore.instance.collection('tasks').doc().id;
+      await FirebaseFirestore.instance
+          .collection('tasks') // Main collection
+          .doc(taskUid) // Document ID for the task
+          .set(task.toMap());
+      print("Task data saved successfully with ID: $taskUid");
+    } catch (e) {
+      print("Error saving task data: $e");
+    }
+  }
+
+  // Read tasks from Firestore
   Stream<List<Task>> getTasks() {
     return taskCollection.snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
