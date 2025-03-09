@@ -15,7 +15,7 @@ class Task {
     required this.isChecked,
   });
 
-  // Convert a Task into a Map (for SQLite)
+  // Convert a Task into a Map
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -27,7 +27,7 @@ class Task {
     };
   }
 
-  // Convert a Map into a Task (from SQLite query result)
+  // Convert a Map into a Task
   factory Task.fromMapObject(Map<String, dynamic> map) {
     return Task(
       id: map['id'],
