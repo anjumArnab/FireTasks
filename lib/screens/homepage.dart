@@ -22,6 +22,7 @@ class _HomePageState extends State<HomePage> {
   List<Task> filteredTasks = [];
   UserModel? userModel;
   bool isLoading = true;
+  User? user = FirebaseAuth.instance.currentUser;
   final FirestoreMethods _firestoreMethods = FirestoreMethods(FirebaseFirestore.instance); 
 
   void _navigateToLogInCreateAccountScreen(BuildContext context) {
@@ -50,13 +51,12 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _fetchUserData();
-    _fetchTasks();
+    _fetchTasks(user!.uid);
   }
 
   Future<void> _fetchUserData() async {
-    User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      UserModel? fetchedUser = await _firestoreMethods.getUserData(user.uid);
+      UserModel? fetchedUser = await _firestoreMethods.getUserData(user!.uid);
       if (fetchedUser != null) {
         setState(() {
           userModel = fetchedUser;
@@ -66,13 +66,19 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _fetchTasks() {
-  FirebaseFirestore.instance.collection('tasks').snapshots().listen((snapshot) {
+  void _fetchTasks(String userUid) {
+  FirebaseFirestore.instance
+      .collection('tasks')
+      .doc(userUid)
+      .collection('userTasks')
+      .snapshots()
+      .listen((snapshot) {
     setState(() {
       filteredTasks = snapshot.docs.map((doc) => Task.fromMapObject(doc.data())).toList();
     });
   });
 }
+
   
   @override
   Widget build(BuildContext context) {
