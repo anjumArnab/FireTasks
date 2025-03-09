@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firetasks/models/task_model.dart';
 import 'package:firetasks/widgets/custom_button.dart';
 import 'package:intl/intl.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firetasks/services/database.dart';
 
 class CreateTaskPage extends StatefulWidget {
   final Task? task;
@@ -11,30 +12,29 @@ class CreateTaskPage extends StatefulWidget {
   const CreateTaskPage({super.key, this.task, this.taskIndex});
 
   @override
-  // ignore: library_private_types_in_public_api
   _CreateTaskPageState createState() => _CreateTaskPageState();
 }
 
 class _CreateTaskPageState extends State<CreateTaskPage> {
+  final FirestoreMethods firestoreMethods = FirestoreMethods(FirebaseFirestore.instance);
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
   String priority = 'Medium';
-  
+  bool isChecked = false;
 
   @override
   void initState() {
     super.initState();
     if (widget.task != null) {
-      // Set existing task details
       titleController.text = widget.task!.title;
       descriptionController.text = widget.task!.description;
       timeController.text = widget.task!.timeAndDate;
       priority = widget.task!.priority;
+      isChecked = widget.task!.isChecked;
     } else {
-      // Set initial time to current device time and date
-      timeController.text =
-          DateFormat('yyyy-MM-dd, h:mm a').format(DateTime.now());
+      timeController.text = DateFormat('yyyy-MM-dd, h:mm a').format(DateTime.now());
+      isChecked = false;
     }
   }
 
@@ -59,8 +59,7 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
           pickedTime.minute,
         );
         setState(() {
-          timeController.text =
-              DateFormat('yyyy-MM-dd, h:mm a').format(finalDateTime);
+          timeController.text = DateFormat('yyyy-MM-dd, h:mm a').format(finalDateTime);
         });
       }
     }
@@ -70,10 +69,8 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
     return Expanded(
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor:
-              priority == priorityValue ? color : Colors.grey.shade300,
-          foregroundColor:
-              priority == priorityValue ? Colors.white : Colors.black,
+          backgroundColor: priority == priorityValue ? color : Colors.grey.shade300,
+          foregroundColor: priority == priorityValue ? Colors.white : Colors.black,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -86,6 +83,38 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
         child: Text(priorityValue),
       ),
     );
+  }
+
+  Future<void> _saveOrUpdateTask() async {
+    String title = titleController.text.trim();
+    String description = descriptionController.text.trim();
+    String timeAndDate = timeController.text.trim();
+
+    if (title.isEmpty || description.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Title and Description cannot be empty!")),
+      );
+      return;
+    }
+
+    Task task = Task(
+      title: title,
+      description: description,
+      timeAndDate: timeAndDate,
+      priority: priority,
+      isChecked: isChecked,
+    );
+
+    if (widget.task == null) {
+      // Save new task
+      await firestoreMethods.saveTaskData(task, DateTime.now().millisecondsSinceEpoch.toString());
+    } else {
+      // Update existing task
+      task.id = widget.task!.id; // Retain existing ID
+      await firestoreMethods.updateTaskData(task);
+    }
+
+    Navigator.pop(context); // Close the screen after saving/updating
   }
 
   @override
@@ -103,9 +132,7 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
                 controller: titleController,
                 decoration: const InputDecoration(
                   labelText: 'Title',
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black),
-                  ),
+                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 10),
@@ -114,9 +141,7 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
                 maxLines: 3,
                 decoration: const InputDecoration(
                   labelText: 'Description',
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black),
-                  ),
+                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 10),
@@ -128,14 +153,12 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
                       readOnly: true,
                       decoration: const InputDecoration(
                         labelText: 'Time & Date',
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black),
-                        ),
+                        border: OutlineInputBorder(),
                       ),
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.calendar_today, color: Colors.black),
+                    icon: const Icon(Icons.calendar_today),
                     onPressed: _selectDateTime,
                   ),
                 ],
@@ -153,7 +176,7 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
               ),
               const SizedBox(height: 20),
               CustomButton(
-                onPressed: (){},
+                onPressed: _saveOrUpdateTask,
                 text: widget.task == null ? 'Done' : 'Update',
               ),
             ],
