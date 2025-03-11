@@ -6,7 +6,7 @@ class FirestoreMethods {
   final FirebaseFirestore _firestore;
   FirestoreMethods(this._firestore);
   final CollectionReference tasksCollection =
-    FirebaseFirestore.instance.collection('tasks');
+      FirebaseFirestore.instance.collection('tasks');
 
   // Save user data to Firestore
   Future<void> saveUserData(UserModel user, String uid) async {
@@ -34,31 +34,33 @@ class FirestoreMethods {
 
   // Save task data to Firestore
   Future<void> saveTaskData(Task task, String userUid) async {
-  try {
-    // Create a reference to the user's task subcollection
-    CollectionReference userTasksCollection = tasksCollection
-        .doc(userUid)
-        .collection('userTasks');
+    try {
+      // Create a reference to the user's task subcollection
+      CollectionReference userTasksCollection =
+          tasksCollection.doc(userUid).collection('userTasks');
 
-    // Generate a new document ID for the task
-    String taskUid = userTasksCollection.doc().id;
+      // Generate a new document ID for the task
+      String taskUid = userTasksCollection.doc().id;
 
-    // Save the task data to Firestore
-    await userTasksCollection.doc(taskUid).set(task.toMap());
+      // Save the task data to Firestore
+      await userTasksCollection.doc(taskUid).set(task.toMap());
 
-    print("Task data saved successfully with ID: $taskUid");
-  } catch (e) {
-    print("Error saving task data: $e");
+      print("Task data saved successfully with ID: $taskUid");
+    } catch (e) {
+      print("Error saving task data: $e");
+    }
   }
-}
 
-
-  // Read tasks from Firestore
-  Stream<List<Task>> getTasks() {
-    return tasksCollection.snapshots().map((snapshot) {
+  // Read tasks from Firestore for a specific user
+  Stream<List<Task>> getTasks(String userUid) {
+    return tasksCollection
+        .doc(userUid)
+        .collection('userTasks')
+        .snapshots()
+        .map((snapshot) {
       return snapshot.docs.map((doc) {
         return Task.fromMapObject(doc.data() as Map<String, dynamic>)
-          ..id = doc.id.hashCode; // Assign Firestore doc ID as hashCode
+          ..id = doc.id.hashCode;
       }).toList();
     });
   }
