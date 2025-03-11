@@ -23,7 +23,8 @@ class _HomePageState extends State<HomePage> {
   UserModel? userModel;
   bool isLoading = true;
   User? user = FirebaseAuth.instance.currentUser;
-  final FirestoreMethods _firestoreMethods = FirestoreMethods(FirebaseFirestore.instance);
+  final FirestoreMethods _firestoreMethods =
+      FirestoreMethods(FirebaseFirestore.instance);
 
   void _navigateToLogInCreateAccountScreen(BuildContext context) {
     Navigator.push(
@@ -69,18 +70,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _fetchTasks(String userUid) {
-    FirebaseFirestore.instance
-        .collection('tasks')
-        .doc(userUid)
-        .collection('userTasks')
-        .snapshots()
-        .listen((snapshot) {
+    _firestoreMethods.getTasks(userUid).listen((taskList) {
       setState(() {
-        tasks = snapshot.docs
-            // ignore: unnecessary_null_comparison
-            .map((doc) => doc.data() != null ? Task.fromMapObject(doc.data()) : null)
-            .whereType<Task>() // Removes null values
-            .toList();
+        tasks = taskList;
       });
     });
   }
@@ -91,7 +83,10 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text("FireTasks"),
         actions: [
-          IconButton(icon: const Icon(Icons.add), onPressed: () => _navigateToCreateTaskPage(context),),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () => _navigateToCreateTaskPage(context),
+          ),
           const SizedBox(width: 30),
           StreamBuilder<User?>(
             stream: FirebaseAuth.instance.authStateChanges(),
@@ -117,74 +112,75 @@ class _HomePageState extends State<HomePage> {
               onExit: () => Navigator.pop(context),
             ),
       body: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: GridView.builder(
-                itemCount: tasks.isEmpty ? 1 : tasks.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 5 / 5,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
+        padding: const EdgeInsets.all(16.0),
+        child: GridView.builder(
+          itemCount: tasks.isEmpty ? 1 : tasks.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 5 / 5,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+          ),
+          itemBuilder: (context, index) {
+            if (tasks.isEmpty) {
+              return GestureDetector(
+                onTap: () => _navigateToCreateTaskPage(context),
+                child: TaskCard(
+                  task: Task(
+                    id: 0,
+                    title: 'Welcome to task manager',
+                    description: 'Add your tasks.',
+                    timeAndDate: '',
+                    priority: '',
+                    isChecked: false,
+                  ),
+                  onCheckboxChanged: null,
+                  onDelete: null,
                 ),
-                itemBuilder: (context, index) {
-                  if (tasks.isEmpty) {
-                    return GestureDetector(
-                      onTap: () => _navigateToCreateTaskPage(context),
+              );
+            }
+            final task = tasks[index];
+            return DragTarget<Task>(
+              onAcceptWithDetails: (draggedTask) {
+                setState(() {
+                  int oldIndex = tasks.indexOf(draggedTask.data);
+                  tasks.removeAt(oldIndex);
+                  tasks.insert(index, draggedTask.data);
+                });
+              },
+              builder: (context, candidateData, rejectedData) {
+                return Opacity(
+                  opacity: task.isChecked ? 0.5 : 1.0,
+                  child: Draggable<Task>(
+                    data: task,
+                    feedback: Material(
                       child: TaskCard(
-                        task: Task(
-                          id: 0,
-                          title: 'Welcome to task manager',
-                          description: 'Add your tasks.',
-                          timeAndDate: '',
-                          priority: '',
-                          isChecked: false,
-                        ),
+                        task: task,
                         onCheckboxChanged: null,
                         onDelete: null,
                       ),
-                    );
-                  }
-                  final task = tasks[index];
-                  return DragTarget<Task>(
-                    onAcceptWithDetails: (draggedTask) {
-                      setState(() {
-                        int oldIndex = tasks.indexOf(draggedTask.data);
-                        tasks.removeAt(oldIndex);
-                        tasks.insert(index, draggedTask.data);
-                      });
-                    },
-                    builder: (context, candidateData, rejectedData) {
-                      return Opacity(
-                        opacity: task.isChecked ? 0.5 : 1.0,
-                        child: Draggable<Task>(
-                          data: task,
-                          feedback: Material(
-                            child: TaskCard(
-                              task: task,
-                              onCheckboxChanged: null,
-                              onDelete: null,
-                            ),
-                          ),
-                          childWhenDragging: const SizedBox.shrink(),
-                          child: GestureDetector(
-                            onTap: () => _navigateToCreateTaskPage(context, task: task),
-                            child: TaskCard(
-                              task: task,
-                              onCheckboxChanged: (value) {
-                                setState(() {
-                                  task.isChecked = value ?? false;
-                                });
-                              },
-                              onDelete: () {},
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
+                    ),
+                    childWhenDragging: const SizedBox.shrink(),
+                    child: GestureDetector(
+                      onTap: () =>
+                          _navigateToCreateTaskPage(context, task: task),
+                      child: TaskCard(
+                        task: task,
+                        onCheckboxChanged: (value) {
+                          setState(() {
+                            task.isChecked = value ?? false;
+                          });
+                        },
+                        onDelete: () {},
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ),
     );
   }
 }
