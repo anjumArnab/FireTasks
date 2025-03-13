@@ -30,7 +30,7 @@ class FirebaseAuthMethods {
       User? user = userCredential.user;
       if (user != null && !user.emailVerified) {
         await sendEmailVerification(context);
-        await _auth.signOut(); // Force sign-out after registration
+        await _auth.signOut();
       }
       */
 

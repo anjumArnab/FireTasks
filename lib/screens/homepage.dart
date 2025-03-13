@@ -88,7 +88,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () => _navigateToCreateTaskPage(context),
           ),
           const SizedBox(width: 30),
-          StreamBuilder<User?>(
+          StreamBuilder<User?>( 
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (context, snapshot) {
               if (snapshot.hasData && snapshot.data != null) {
@@ -140,43 +140,20 @@ class _HomePageState extends State<HomePage> {
               );
             }
             final task = tasks[index];
-            return DragTarget<Task>(
-              onAcceptWithDetails: (draggedTask) {
-                setState(() {
-                  int oldIndex = tasks.indexOf(draggedTask.data);
-                  tasks.removeAt(oldIndex);
-                  tasks.insert(index, draggedTask.data);
-                });
-              },
-              builder: (context, candidateData, rejectedData) {
-                return Opacity(
-                  opacity: task.isChecked ? 0.5 : 1.0,
-                  child: Draggable<Task>(
-                    data: task,
-                    feedback: Material(
-                      child: TaskCard(
-                        task: task,
-                        onCheckboxChanged: null,
-                        onDelete: null,
-                      ),
-                    ),
-                    childWhenDragging: const SizedBox.shrink(),
-                    child: GestureDetector(
-                      onTap: () =>
-                          _navigateToCreateTaskPage(context, task: task),
-                      child: TaskCard(
-                        task: task,
-                        onCheckboxChanged: (value) {
-                          setState(() {
-                            task.isChecked = value ?? false;
-                          });
-                        },
-                        onDelete: () {},
-                      ),
-                    ),
-                  ),
-                );
-              },
+            return GestureDetector(
+              onTap: () => _navigateToCreateTaskPage(context, task: task),
+              child: Opacity(
+                opacity: task.isChecked ? 0.5 : 1.0,
+                child: TaskCard(
+                  task: task,
+                  onCheckboxChanged: (value) {
+                    setState(() {
+                      task.isChecked = value ?? false;
+                    });
+                  },
+                  onDelete: () {},
+                ),
+              ),
             );
           },
         ),
