@@ -4,6 +4,6 @@ FireTask is a task management app built using **Flutter**. It utilizes **Firebas
 
 ## Features
 
-- 🔐 **Firebase Authentication** (Sign up, Login, Logout)
-- 📂 **CRUD Operations** on tasks using **Cloud Firestore**
-- 🏗 **Provider** for state management
+- **Firebase Authentication** (Sign up, Login, Logout)
+- **CRUD Operations** on tasks using **Cloud Firestore**
+- **Provider** for state management
