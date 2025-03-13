@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firetasks/models/task_model.dart';
 import 'package:firetasks/widgets/custom_button.dart';
 import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firetasks/services/database.dart';
+import 'package:provider/provider.dart';
+import 'package:firetasks/providers/task_provider.dart'; // Import TaskProvider
 
 class CreateTaskPage extends StatefulWidget {
   final Task? task;
@@ -17,7 +17,6 @@ class CreateTaskPage extends StatefulWidget {
 }
 
 class _CreateTaskPageState extends State<CreateTaskPage> {
-  final FirestoreMethods firestoreMethods = FirestoreMethods(FirebaseFirestore.instance);
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
@@ -107,13 +106,14 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
       isChecked: isChecked,
     );
 
+    // Use TaskProvider to save or update the task
     if (widget.task == null) {
-      // Save new task
-      await firestoreMethods.saveTaskData(task, user!.uid);
+      // Save new task using TaskProvider
+      await context.read<TaskProvider>().saveTask(task, user!.uid);
     } else {
-      // Update existing task
+      // Update existing task using TaskProvider
       task.id = widget.task!.id; // Retain existing ID
-      await firestoreMethods.updateTaskData(task);
+      await context.read<TaskProvider>().updateTask(task);
     }
 
     Navigator.pop(context); // Close the screen after saving/updating
