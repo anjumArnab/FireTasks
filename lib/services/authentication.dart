@@ -14,26 +14,21 @@ class FirebaseAuthMethods {
     required BuildContext context,
   }) async {
     try {
-      /*
       UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      */
       await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      /*
       User? user = userCredential.user;
       if (user != null && !user.emailVerified) {
         await sendEmailVerification(context);
         await _auth.signOut();
       }
-      */
-
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
@@ -50,7 +45,8 @@ class FirebaseAuthMethods {
           email: email, password: password);
 
       User? user = userCredential.user;
-      if (user != null) { // && user.emailVerified
+      if (user != null) {
+        // && user.emailVerified
         showSnackBar(context, "Login successful!");
       } else {
         await _auth.signOut();
@@ -73,20 +69,22 @@ class FirebaseAuthMethods {
 
   // Google Sign In
   Future<void> signInWithGoogle(BuildContext context) async {
-    try{
+    try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
-      
-      if (googleAuth?.accessToken != null && googleAuth?.idToken != null){
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
+
+      if (googleAuth?.accessToken != null && googleAuth?.idToken != null) {
         final credential = GoogleAuthProvider.credential(
           accessToken: googleAuth?.accessToken,
           idToken: googleAuth?.idToken,
         );
-        UserCredential userCredential = await _auth.signInWithCredential(credential);
+        UserCredential userCredential =
+            await _auth.signInWithCredential(credential);
         User? user = userCredential.user;
-        if (user != null){
+        if (user != null) {
           showSnackBar(context, "Login successful!");
-      }
+        }
       }
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
@@ -94,8 +92,9 @@ class FirebaseAuthMethods {
   }
 
   // Update Email
-  Future<void> updateEmail({required String newEmail, required BuildContext context}) async{
-    try{
+  Future<void> updateEmail(
+      {required String newEmail, required BuildContext context}) async {
+    try {
       await _auth.currentUser?.verifyBeforeUpdateEmail(newEmail);
       showSnackBar(context, "Email updated successfully.");
     } on FirebaseAuthException catch (e) {
@@ -104,7 +103,7 @@ class FirebaseAuthMethods {
   }
 
   // Change Password
-    Future<void> updatePasswordWithReauthentication({
+  Future<void> updatePasswordWithReauthentication({
     required String oldPassword,
     required String newPassword,
     required String confirmPassword,
@@ -113,7 +112,8 @@ class FirebaseAuthMethods {
     try {
       // Check if new password and confirm password match
       if (newPassword != confirmPassword) {
-        showSnackBar(context, "New password and confirm password do not match.");
+        showSnackBar(
+            context, "New password and confirm password do not match.");
         return;
       }
 
@@ -157,6 +157,4 @@ class FirebaseAuthMethods {
       showSnackBar(context, e.message!);
     }
   }
-  
-
 }
