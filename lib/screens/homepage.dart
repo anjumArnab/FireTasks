@@ -132,9 +132,7 @@ class _HomePageState extends State<HomePage> {
                                 taskProvider.updateTask(task);
                               }
                             },
-                            onDelete: () {
-                              //taskProvider.deleteTask(task.id);
-                            },
+                            onDelete: () {}
                           ),
                         ),
                       );
