@@ -1,15 +1,14 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firetasks/models/task_model.dart';
-import 'package:firetasks/models/user_model.dart';
+import 'package:firetasks/providers/auth_provider.dart';
+import 'package:firetasks/providers/task_provider.dart';
+import 'package:firetasks/providers/user_provider.dart';
 import 'package:firetasks/screens/create_tasks.dart';
 import 'package:firetasks/screens/login_page.dart';
-import 'package:firetasks/services/authentication.dart';
 import 'package:firetasks/widgets/custom_button.dart';
 import 'package:firetasks/widgets/drawer.dart';
-import 'package:firetasks/services/database.dart';
 import 'package:firetasks/widgets/task_card.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,12 +18,29 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Task> tasks = [];
-  UserModel? userModel;
-  bool isLoading = true;
-  User? user = FirebaseAuth.instance.currentUser;
-  final FirestoreMethods _firestoreMethods =
-      FirestoreMethods(FirebaseFirestore.instance);
+  @override
+  void initState() {
+    super.initState();
+    // Initialize providers after the widget is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeProviders();
+    });
+  }
+
+  void _initializeProviders() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+
+    if (authProvider.isAuthenticated) {
+      String uid = authProvider.user!.uid;
+      userProvider.fetchUserData(uid);
+      taskProvider.startListeningToTasks(uid);
+    } else {
+      userProvider.clearUserData();
+      taskProvider.clearTasks();
+    }
+  }
 
   void _navigateToLogInCreateAccountScreen(BuildContext context) {
     Navigator.push(
@@ -44,120 +60,96 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _signOutUser() async {
-    FirebaseAuthMethods(FirebaseAuth.instance).signOut(context);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    if (user != null) {
-      _fetchUserData();
-      _fetchTasks(user!.uid);
-    }
-  }
-
-  Future<void> _fetchUserData() async {
-    if (user != null) {
-      UserModel? fetchedUser = await _firestoreMethods.getUserData(user!.uid);
-      if (mounted) {
-        setState(() {
-          userModel = fetchedUser;
-          isLoading = false;
-        });
-      }
-    }
-  }
-
-  void _fetchTasks(String userUid) {
-    _firestoreMethods.getTasks(userUid).listen((taskList) {
-      setState(() {
-        tasks = taskList;
-      });
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("FireTasks"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () => _navigateToCreateTaskPage(context),
-          ),
-          const SizedBox(width: 30),
-          StreamBuilder<User?>( 
-            stream: FirebaseAuth.instance.authStateChanges(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData && snapshot.data != null) {
-                return const SizedBox(width: 15);
-              } else {
-                return CustomButton(
-                  onPressed: () => _navigateToLogInCreateAccountScreen(context),
-                  text: 'Login',
-                );
-              }
-            },
-          ),
-          const SizedBox(width: 30),
-        ],
-      ),
-      drawer: userModel == null
-          ? null
-          : CustomDrawer(
-              userModel: userModel!,
-              onLogout: _signOutUser,
-              onExit: () => Navigator.pop(context),
-            ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: GridView.builder(
-          itemCount: tasks.isEmpty ? 1 : tasks.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 5 / 5,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-          ),
-          itemBuilder: (context, index) {
-            if (tasks.isEmpty) {
-              return GestureDetector(
-                onTap: () => _navigateToCreateTaskPage(context),
-                child: TaskCard(
-                  task: Task(
-                    id: 0,
-                    title: 'Welcome to task manager',
-                    description: 'Add your tasks.',
-                    timeAndDate: '',
-                    priority: '',
-                    isChecked: false,
-                  ),
-                  onCheckboxChanged: null,
-                  onDelete: null,
-                ),
-              );
-            }
-            final task = tasks[index];
-            return GestureDetector(
-              onTap: () => _navigateToCreateTaskPage(context, task: task),
-              child: Opacity(
-                opacity: task.isChecked ? 0.5 : 1.0,
-                child: TaskCard(
-                  task: task,
-                  onCheckboxChanged: (value) {
-                    setState(() {
-                      task.isChecked = value ?? false;
-                    });
-                  },
-                  onDelete: () {},
-                ),
+    return Consumer3<AuthProvider, UserProvider, TaskProvider>(
+      builder: (context, authProvider, userProvider, taskProvider, _) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text("FireTasks"),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () => _navigateToCreateTaskPage(context),
               ),
-            );
-          },
-        ),
-      ),
+              const SizedBox(width: 30),
+              authProvider.isAuthenticated
+                  ? const SizedBox(width: 15)
+                  : CustomButton(
+                      onPressed: () => _navigateToLogInCreateAccountScreen(context),
+                      text: 'Login',
+                    ),
+              const SizedBox(width: 30),
+            ],
+          ),
+          drawer: userProvider.userModel == null
+              ? null
+              : CustomDrawer(
+                  userModel: userProvider.userModel!,
+                  onLogout: () => authProvider.signOut(context),
+                  onExit: () => Navigator.pop(context),
+                ),
+          body: authProvider.isLoading || userProvider.isLoading || taskProvider.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: GridView.builder(
+                    itemCount: taskProvider.tasks.isEmpty ? 1 : taskProvider.tasks.length,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 5 / 5,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                    ),
+                    itemBuilder: (context, index) {
+                      if (taskProvider.tasks.isEmpty) {
+                        return GestureDetector(
+                          onTap: () => _navigateToCreateTaskPage(context),
+                          child: TaskCard(
+                            task: Task(
+                              id: 0,
+                              title: 'Welcome to task manager',
+                              description: 'Add your tasks.',
+                              timeAndDate: '',
+                              priority: '',
+                              isChecked: false,
+                            ),
+                            onCheckboxChanged: null,
+                            onDelete: null,
+                          ),
+                        );
+                      }
+                      final task = taskProvider.tasks[index];
+                      return GestureDetector(
+                        onTap: () => _navigateToCreateTaskPage(context, task: task),
+                        child: Opacity(
+                          opacity: task.isChecked ? 0.5 : 1.0,
+                          child: TaskCard(
+                            task: task,
+                            onCheckboxChanged: (value) {
+                              if (value != null) {
+                                task.isChecked = value;
+                                taskProvider.updateTask(task);
+                              }
+                            },
+                            onDelete: () {
+                              //taskProvider.deleteTask(task.id);
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+        );
+      },
     );
+  }
+
+  @override
+  void dispose() {
+    // Stop listening to tasks when the widget is disposed
+    Provider.of<TaskProvider>(context, listen: false).stopListeningToTasks();
+    super.dispose();
   }
 }
