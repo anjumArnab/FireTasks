@@ -59,7 +59,7 @@ class TaskProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-
+/*
   // Update an existing task
   Future<void> updateTask(Task task) async {
     _isLoading = true;
@@ -78,26 +78,66 @@ class TaskProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+*/
+ // Update an existing task
+  Future<void> updateTask(Task task, String userUid) async {
+    _isLoading = true;
+    notifyListeners();
 
+    try {
+      await _firestoreMethods.updateTaskData(task, userUid);
+      
+      // Update the task in local list
+      final index = _tasks.indexWhere((t) => t.id == task.id);
+      if (index != -1) {
+        _tasks[index] = task;
+      }
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+/*
   // Toggle task completion status
   Future<void> toggleTaskStatus(Task task) async {
     task.isChecked = !task.isChecked;
     await updateTask(task);
   }
-
+*/
+  // Toggle task completion status
+  Future<void> toggleTaskStatus(Task task, String userUid) async {
+    task.isChecked = !task.isChecked;
+    await updateTask(task, userUid);
+  }
+  /*
   // Delete task
-  Future<void> deleteTask(int taskId) async {
+ Future<void> deleteTask(String taskId) async {
+  _isLoading = true;
+  notifyListeners();
+
+  try {
+    await _firestoreMethods.deleteTaskData(taskId.toString());
+    _tasks.removeWhere((task) => task.id == taskId);
+  } finally {
+    _isLoading = false;
+    notifyListeners();
+  }
+}
+*/
+  // Delete task
+  Future<void> deleteTask(String taskId, String userUid) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      await _firestoreMethods.deleteTaskData(taskId);
+      await _firestoreMethods.deleteTaskData(taskId, userUid);
       _tasks.removeWhere((task) => task.id == taskId);
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
+
 
   // Clear tasks
   void clearTasks() {
