@@ -113,7 +113,7 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
     } else {
       // Update existing task using TaskProvider
       task.id = widget.task!.id; // Retain existing ID
-      await context.read<TaskProvider>().updateTask(task);
+      await context.read<TaskProvider>().updateTask(task, user!.uid);
     }
 
     Navigator.pop(context); // Close the screen after saving/updating

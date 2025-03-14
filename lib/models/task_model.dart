@@ -1,5 +1,5 @@
 class Task {
-  int? id;
+  String? id;
   String title;
   String description;
   String timeAndDate;
@@ -15,17 +15,16 @@ class Task {
     required this.isChecked,
   });
 
-  // Convert a Task into a Map
   Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'title': title,
-      'description': description,
-      'timeAndDate': timeAndDate,
-      'priority': priority,
-      'isChecked': isChecked ? 1 : 0,
-    };
-  }
+  return {
+    'id': id ?? '', // Store Firestore document ID directly
+    'title': title,
+    'description': description,
+    'timeAndDate': timeAndDate,
+    'priority': priority,
+    'isChecked': isChecked ? 1 : 0,
+  };
+}
 
   // Convert a Map into a Task
   factory Task.fromMapObject(Map<String, dynamic> map) {
