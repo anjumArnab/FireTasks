@@ -107,7 +107,7 @@ class _HomePageState extends State<HomePage> {
                           onTap: () => _navigateToCreateTaskPage(context),
                           child: TaskCard(
                             task: Task(
-                              id: 0,
+                              //id: 0 as String,
                               title: 'Welcome to task manager',
                               description: 'Add your tasks.',
                               timeAndDate: '',
@@ -129,10 +129,10 @@ class _HomePageState extends State<HomePage> {
                             onCheckboxChanged: (value) {
                               if (value != null) {
                                 task.isChecked = value;
-                                taskProvider.updateTask(task);
+                                taskProvider.updateTask(task, authProvider.user!.uid);
                               }
                             },
-                            onDelete: () {}
+                            onDelete: () => taskProvider.deleteTask(task.id!, authProvider.user!.uid),
                           ),
                         ),
                       );
