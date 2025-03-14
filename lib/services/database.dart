@@ -8,6 +8,7 @@ class FirestoreMethods {
   final CollectionReference tasksCollection =
       FirebaseFirestore.instance.collection('tasks');
 
+
   // Save user data to Firestore
   Future<void> saveUserData(UserModel user, String uid) async {
     try {
@@ -32,43 +33,43 @@ class FirestoreMethods {
     return null;
   }
 
-  // Save task data to Firestore
   Future<void> saveTaskData(Task task, String userUid) async {
-    try {
-      // Create a reference to the user's task subcollection
-      CollectionReference userTasksCollection =
-          tasksCollection.doc(userUid).collection('userTasks');
+  try {
+    CollectionReference userTasksCollection =
+        tasksCollection.doc(userUid).collection('userTasks');
 
-      // Generate a new document ID for the task
-      String taskUid = userTasksCollection.doc().id;
+    String taskUid = userTasksCollection.doc().id; // Generate document ID
+    task.id = taskUid; // Store actual document ID
 
-      // Save the task data to Firestore
-      await userTasksCollection.doc(taskUid).set(task.toMap());
+    await userTasksCollection.doc(taskUid).set(task.toMap());
 
-      print("Task data saved successfully with ID: $taskUid");
-    } catch (e) {
-      print("Error saving task data: $e");
-    }
+    print("Task data saved successfully with ID: $taskUid");
+  } catch (e) {
+    print("Error saving task data: $e");
   }
+}
+
 
   // Read tasks from Firestore for a specific user
-  Stream<List<Task>> getTasks(String userUid) {
-    return tasksCollection
-        .doc(userUid)
-        .collection('userTasks')
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return Task.fromMapObject(doc.data() as Map<String, dynamic>)
-          ..id = doc.id.hashCode;
-      }).toList();
-    });
-  }
+ Stream<List<Task>> getTasks(String userUid) {
+  return tasksCollection
+      .doc(userUid)
+      .collection('userTasks')
+      .snapshots()
+      .map((snapshot) {
+    return snapshot.docs.map((doc) {
+      return Task.fromMapObject(doc.data() as Map<String, dynamic>)
+        ..id = doc.id; // Assign actual Firestore ID
+    }).toList();
+  });
+}
+
 
   // Update task data in Firestore
-  Future<void> updateTaskData(Task task) async {
+  Future<void> updateTaskData(Task task, String userUid) async {
     try {
-      await tasksCollection.doc(task.id.toString()).update(task.toMap());
+      // await tasksCollection.doc(task.id.toString()).update(task.toMap());
+      await tasksCollection.doc(userUid).collection('userTasks').doc(task.id.toString()).update(task.toMap());
       print("Task data updated successfully.");
     } catch (e) {
       print("Error updating task data: $e");
@@ -76,12 +77,13 @@ class FirestoreMethods {
   }
 
   // Delete task data from Firestore
-  Future<void> deleteTaskData(int id) async {
-    try {
-      await tasksCollection.doc(id.toString()).delete();
-      print("Task data deleted successfully.");
-    } catch (e) {
-      print("Error deleting task data: $e");
-    }
+  Future<void> deleteTaskData(String id, String userUid) async {
+  try {
+    // await tasksCollection.doc(id).delete();
+    await tasksCollection.doc(userUid).collection('userTasks').doc(id.toString()).delete();
+    print("Task data deleted successfully.");
+  } catch (e) {
+    print("Error deleting task data: $e");
   }
+}
 }
